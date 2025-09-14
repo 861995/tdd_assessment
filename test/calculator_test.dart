@@ -15,6 +15,7 @@ void main() {
     expect(calculator.add("1\n2,3,4,5"), 15);
     expect(calculator.add("1,\n2,3,4,5"), 15);
     expect(calculator.add("1,\n\n2,3,\n4,5"), 15);
+    expect(calculator.add("//;\n1;2"), 3);
   });
 }
 
@@ -24,7 +25,8 @@ class StringCalculator {
       return 0;
     } else if (numbers.contains(',') || numbers.contains('\n')) {
       if (numbers.contains('\n')) {
-        numbers = numbers.replaceAll('\n', ',');
+        // Even the delimiter starts with '//' or not this condition will work & replace it to ','
+        numbers = numbers.replaceAll(RegExp(r'(\n|//|;)'), ',');
       } else {}
 
       List<String> splittedNum = numbers.split(',');

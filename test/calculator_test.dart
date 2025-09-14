@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
+String negativeThrowMsg = 'negatives not allowed';
+
 void main() {
   test('Calculator test', () {
     final calculator = StringCalculator();
@@ -16,6 +18,26 @@ void main() {
     expect(calculator.add("1,\n2,3,4,5"), 15);
     expect(calculator.add("1,\n\n2,3,\n4,5"), 15);
     expect(calculator.add("//;\n1;2"), 3);
+    expect(
+      () => calculator.add("1,-2,3"),
+      throwsA(
+        predicate(
+          (e) =>
+              e is Exception &&
+              e.toString().contains("negatives not allowed -2"),
+        ),
+      ),
+    );
+    expect(
+      () => calculator.add("-1,-2,13"),
+      throwsA(
+        predicate(
+          (e) =>
+              e is Exception &&
+              e.toString().contains("$negativeThrowMsg -1,-2"),
+        ),
+      ),
+    );
   });
 }
 
@@ -29,14 +51,25 @@ class StringCalculator {
         numbers = numbers.replaceAll(RegExp(r'(\n|//|;)'), ',');
       } else {}
 
-      List<String> splittedNum = numbers.split(',');
-      List<int> nums = [];
-      for (var splitNum in splittedNum) {
+      List<String> splitNum = numbers.split(',');
+      List<int> positiveNum = [];
+      List<int> negativeNum = [];
+
+      for (var splitNum in splitNum) {
         if (splitNum.isNotEmpty) {
-          nums.add(int.parse(splitNum));
+          int parsedNum = int.parse(splitNum);
+
+          if (!parsedNum.isNegative) {
+            positiveNum.add(parsedNum);
+          } else {
+            negativeNum.add(parsedNum);
+          }
         }
       }
-      return nums.fold(0, (sum, element) => sum + element);
+      if (negativeNum.isNotEmpty) {
+        throw Exception("$negativeThrowMsg ${negativeNum.join(',')}");
+      }
+      return positiveNum.fold(0, (sum, element) => sum + element);
     }
     return int.parse(numbers);
   }

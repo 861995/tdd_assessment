@@ -42,6 +42,8 @@ void main() {
     expect(calculator.add("1003,2"), 2);
     expect(calculator.add("//[***]\n1***2***3"), 6);
     expect(calculator.add("//[abc]\n4abc5abc6"), 15);
+    expect(calculator.add("//@\n2@4@6"), 12);
+    expect(calculator.add("//%\n7%3%10"), 20);
   });
 }
 
@@ -53,7 +55,8 @@ class StringCalculator {
       if (numbers.contains('\n')) {
         // Even the delimiter starts with '//' or not this condition will work & replace it to ','
         numbers = numbers.replaceAll(
-          RegExp(r'(\n|//|;|\*|\[|\]|[A-Za-z]|-)'),
+          RegExp(r'(\n|//|;|\*|\[|\]|[A-Za-z]|-|#|@|%|&|!)'),
+
           ',',
         );
       } else {}

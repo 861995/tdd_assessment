@@ -82,11 +82,10 @@ class StringCalculator {
     bool isDelimiterPresent = RegExp(
       r'(\n|//|;|\*|\[|\]|[A-Za-z]|#|@|%|&|!|,)',
     ).hasMatch(numbers);
+    // return 0 if the value is just '';
+    if (numbers.isEmpty) return 0;
 
-    if (numbers.isEmpty) {
-      // return 0 if the value is just '';
-      return 0;
-    } else if (isDelimiterPresent) {
+    if (isDelimiterPresent) {
       // Even the delimiter starts with '//' or not this condition will work & replace it to ','
       numbers = numbers.replaceAll(
         RegExp(r'(\n|//|;|\*|\[|\]|[A-Za-z]|#|@|%|&|!)'),
@@ -94,34 +93,33 @@ class StringCalculator {
         ',',
       );
 
-      List<String> splitNum = numbers.split(',');
+      List<String> splitNumList = numbers.split(',');
       List<int> positiveNum = [];
       List<int> negativeNum = [];
 
-      for (var splitNum in splitNum) {
-        if (splitNum.isNotEmpty) {
-          int parsedNum = int.parse(splitNum);
+      for (var splitNum in splitNumList) {
+        // adding just a safety check so if there is '' will be avoided
+        if (splitNum.isEmpty) continue;
 
-          if (!parsedNum.isNegative) {
-            if (parsedNum <= 1000) {
-              positiveNum.add(parsedNum);
-            }
-          } else {
-            negativeNum.add(parsedNum);
-          }
+        int parsedNum = int.parse(splitNum);
+
+        if (parsedNum.isNegative) {
+          negativeNum.add(parsedNum);
+        } else if (parsedNum <= 1000) {
+          positiveNum.add(parsedNum);
         }
+        // above 1000 are ignored
       }
       if (negativeNum.isNotEmpty) {
         throw Exception("$negativeThrowMsg ${negativeNum.join(',')}");
       }
       return positiveNum.fold(0, (sum, element) => sum + element);
     } else {
-      if (int.parse(numbers) >= 1000) {
-        return 0;
-      } else {
-        // this will execute if there is only one number is there
-        return int.parse(numbers);
-      }
+      // single num case
+      //greater than 1000 are given 0, numbers=1000, then output will be 0
+      // numbers ='10'; then output will be 10
+      int singleNum = int.parse(numbers);
+      return singleNum >= 1000 ? 0 : singleNum;
     }
   }
 }
